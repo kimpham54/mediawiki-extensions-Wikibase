@@ -37,6 +37,10 @@ function skipIfNoOpenSearch() {
 }
 
 describe( 'Wikibase GraphQL', () => {
+	before( function () {
+		skipIfNoOpenSearch.call( this );
+	} );
+	
 	let item1;
 	let item2;
 	let item3;
