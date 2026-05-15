@@ -221,9 +221,9 @@ describe( 'Wikibase GraphQL', () => {
 	} );
 
 	describe( 'searchItems', () => {
-		before( function () {
-			skipIfNoOpenSearch.call( this );
-		} );
+		// before( function () {
+		// 	skipIfNoOpenSearch.call( this );
+		// } );
 
 		it( 'property value pair match with "and"', async function () {
 			const response = await queryGraphQL( { query: `
@@ -386,9 +386,9 @@ describe( 'Wikibase GraphQL', () => {
 	} );
 
 	it( 'can look up items by externalId', async () => {
-		before( function () {
-			skipIfNoOpenSearch.call( this );
-		} );
+		// before( function () {
+		// 	skipIfNoOpenSearch.call( this );
+		// } );
 
 		const response = await queryGraphQL( { query: `
 			{
