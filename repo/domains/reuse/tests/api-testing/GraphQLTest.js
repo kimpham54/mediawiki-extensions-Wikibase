@@ -215,9 +215,9 @@ describe( 'Wikibase GraphQL', () => {
 	describe( 'searchItems', () => {
 		before( async function () {
 			// Skip search tests in CI if OpenSearch is not available
-			// if ( process.env.QUIBBLE_OPENSEARCH && process.env.QUIBBLE_OPENSEARCH !== 'true' ) {
-			// 	this.skip();
-			// }
+			if ( process.env.QUIBBLE_OPENSEARCH && process.env.QUIBBLE_OPENSEARCH !== 'true' ) {
+				this.skip();
+			}
 		} );
 
 		it( 'property value pair match with "and"', async function () {

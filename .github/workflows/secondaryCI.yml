@@ -1,13 +1,7 @@
 name: Wikibase Secondary CI
 on:
-  workflow_dispatch:
   push:
     branches: [ master ]
-
-# name: Wikibase Secondary CI
-# on:
-#   push:
-#     branches: [ master ]
 
 env:
   COMPOSER_HOME: ${{ github.workspace }}/.composer
