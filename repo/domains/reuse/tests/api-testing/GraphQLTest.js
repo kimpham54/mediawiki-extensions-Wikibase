@@ -30,6 +30,12 @@ function queryGraphQL( requestBody ) {
 		.send( requestBody );
 }
 
+function skipIfNoOpenSearch() {
+    if ( process.env.QUIBBLE_OPENSEARCH && process.env.QUIBBLE_OPENSEARCH !== 'true' ) {
+        this.skip();
+    }
+}
+
 describe( 'Wikibase GraphQL', () => {
 	let item1;
 	let item2;
@@ -130,7 +136,9 @@ describe( 'Wikibase GraphQL', () => {
 		} );
 	} );
 
-	it( 'can get labels of linked entities with item', async () => {
+	it( 'can get labels of linked entities with item', async function () {
+		skipIfNoOpenSearch.call( this );
+
 		const response = await queryGraphQL( { query: `
 			{
 				item(id: "${ item2.id }") {
@@ -167,7 +175,9 @@ describe( 'Wikibase GraphQL', () => {
 			} );
 	} );
 
-	it( 'can get labels of linked entities of multiple items with itemsById', async () => {
+	it( 'can get labels of linked entities of multiple items with itemsById', async function () {
+		skipIfNoOpenSearch.call( this );
+
 		const response = await queryGraphQL( { query: `
 			{
 				itemsById(ids: ["${ item2.id }", "${ item1.id }"]) {
@@ -213,12 +223,9 @@ describe( 'Wikibase GraphQL', () => {
 	} );
 
 	describe( 'searchItems', () => {
-		// before( async function () {
-		// 	// Skip search tests in CI if OpenSearch is not available
-		// 	if ( process.env.QUIBBLE_OPENSEARCH && process.env.QUIBBLE_OPENSEARCH !== 'true' ) {
-		// 		this.skip();
-		// 	}
-		// } );
+		before( function () {
+			skipIfNoOpenSearch.call( this );
+		} );
 
 		it( 'property value pair match with "and"', async function () {
 			const response = await queryGraphQL( { query: `
@@ -344,7 +351,9 @@ describe( 'Wikibase GraphQL', () => {
 		} );
 	} );
 
-	it( 'can look up items by sitelink', async () => {
+	it( 'can look up items by sitelink', async function () {
+		skipIfNoOpenSearch.call( this );
+
 		const sitelinkTitle = item1.sitelinks[ siteId ].title;
 		const response = await queryGraphQL( { query: `
 			{
@@ -362,9 +371,7 @@ describe( 'Wikibase GraphQL', () => {
 	} );
 
 	it( 'can look up items by externalId', async function () {
-		if ( process.env.QUIBBLE_OPENSEARCH && process.env.QUIBBLE_OPENSEARCH !== 'true' ) {
-			this.skip();
-		}
+		skipIfNoOpenSearch.call( this );
 
 		const response = await queryGraphQL( { query: `
 			{
@@ -425,7 +432,9 @@ describe( 'Wikibase GraphQL', () => {
 			.to.deep.include( { isDeprecated: false } );
 	} );
 
-	it( 'supports operationName parameter, required only if multiple operations are present in the query', async () => {
+	it( 'supports operationName parameter, required only if multiple operations are present in the query', async function () {
+		skipIfNoOpenSearch.call( this );
+
 		const response = await queryGraphQL( {
 			query: `query item1 { item(id: "${ item1.id }") { id } }
 			        query item2 { item(id: "${ item2.id }"){ id } }`,
@@ -443,7 +452,9 @@ describe( 'Wikibase GraphQL', () => {
 			} );
 	} );
 
-	it( 'supports variables parameter', async () => {
+	it( 'supports variables parameter', async function () {
+		skipIfNoOpenSearch.call( this );
+
 		const response = await queryGraphQL( {
 			query: 'query item($id: ItemId!) { item(id : $id) { id } }',
 			variables: { id: item1.id }
