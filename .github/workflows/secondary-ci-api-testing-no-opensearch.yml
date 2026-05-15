@@ -58,20 +58,24 @@ jobs:
 
       - name: Create api-testing config
         run: |
-          cat > .api-testing.config.json <<'EOF'
-          {
+            SECRET_KEY=$(grep "\$wgSecretKey" ../mediawiki/LocalSettings.php | sed -E "s/.*'([^']+)'.*/\1/")
+            cat > .api-testing.config.json <<EOF
+            {
             "base_uri": "http://127.0.0.1:8080/",
             "username": "admin",
-            "password": "shie3Ekutaiy5Giebuwi"
-          }
-          EOF
-          cp .api-testing.config.json repo/rest-api/.api-testing.config.json
+            "password": "shie3Ekutaiy5Giebuwi",
+            "secret_key": "${SECRET_KEY}"
+            }
+            EOF
+            cp .api-testing.config.json repo/rest-api/.api-testing.config.json
 
       - name: Start MediaWiki web server
         working-directory: ../mediawiki
         run: |
-          php -S 127.0.0.1:8080 -t . > /tmp/php-server.log 2>&1 &
-          echo $! > /tmp/php-server.pid
+            nohup php -S 127.0.0.1:8080 -t . >/tmp/php-server.log 2>&1 &
+            echo $! > /tmp/php-server.pid
+            sleep 2
+            ps -p "$(cat /tmp/php-server.pid)" || (cat /tmp/php-server.log && exit 1)
 
       - name: Wait for MediaWiki
         run: |
