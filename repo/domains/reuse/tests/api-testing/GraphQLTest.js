@@ -31,12 +31,13 @@ function queryGraphQL( requestBody ) {
 }
 
 function skipIfNoOpenSearch() {
-    if ( process.env.QUIBBLE_OPENSEARCH && process.env.QUIBBLE_OPENSEARCH !== 'true' ) {
-        this.skip();
-    }
+	if ( process.env.QUIBBLE_OPENSEARCH && process.env.QUIBBLE_OPENSEARCH !== 'true' ) {
+		this.skip();
+	}
 }
 
 describe( 'Wikibase GraphQL', () => {
+	describe( 'queries requiring OpenSearch-backed setup', () => {
 	let item1;
 	let item2;
 	let item3;
@@ -52,6 +53,10 @@ describe( 'Wikibase GraphQL', () => {
 	const property2label = `hasRelationship ${ utils.uniq() }`;
 	const item2Property3StatementValue = 'sweet potato';
 	const item1ExternalId = 'external-id';
+
+	before( function () {
+		skipIfNoOpenSearch.call( this );
+	} );
 
 	before( async () => {
 		await action.getAnon().edit( linkedArticle, { text: 'sitelink test page' } );
@@ -136,8 +141,7 @@ describe( 'Wikibase GraphQL', () => {
 		} );
 	} );
 
-	it( 'can get labels of linked entities with item', async function () {
-		skipIfNoOpenSearch.call( this );
+	it( 'can get labels of linked entities with item', async () => {
 
 		const response = await queryGraphQL( { query: `
 			{
@@ -175,8 +179,7 @@ describe( 'Wikibase GraphQL', () => {
 			} );
 	} );
 
-	it( 'can get labels of linked entities of multiple items with itemsById', async function () {
-		skipIfNoOpenSearch.call( this );
+	it( 'can get labels of linked entities of multiple items with itemsById', async () =>{
 
 		const response = await queryGraphQL( { query: `
 			{
@@ -223,9 +226,6 @@ describe( 'Wikibase GraphQL', () => {
 	} );
 
 	describe( 'searchItems', () => {
-		before( function () {
-			skipIfNoOpenSearch.call( this );
-		} );
 
 		it( 'property value pair match with "and"', async function () {
 			const response = await queryGraphQL( { query: `
@@ -351,8 +351,7 @@ describe( 'Wikibase GraphQL', () => {
 		} );
 	} );
 
-	it( 'can look up items by sitelink', async function () {
-		skipIfNoOpenSearch.call( this );
+	it( 'can look up items by sitelink', async () => {
 
 		const sitelinkTitle = item1.sitelinks[ siteId ].title;
 		const response = await queryGraphQL( { query: `
@@ -370,24 +369,23 @@ describe( 'Wikibase GraphQL', () => {
 		);
 	} );
 
-	it( 'can look up items by externalId', async function () {
-		skipIfNoOpenSearch.call( this );
+	it( 'supports variables parameter', async () => {
 
-		const response = await queryGraphQL( { query: `
-			{
-				itemByExternalId(property: "${ property4.id }", externalId: "${ item1ExternalId }") {
-					... on Item { id }
-				}
-			}` } );
+		const response = await queryGraphQL( {
+			query: 'query item($id: ItemId!) { item(id : $id) { id } }',
+			variables: { id: item1.id }
+		} );
 
 		assert.deepEqual(
 			response.body,
 			{
 				data: {
-					itemByExternalId: { id: item3.id }
+					item: {
+						id: item1.id
+					}
 				}
-			}
-		);
+			} );
+	} );
 	} );
 
 	it( 'supports introspection', async () => {
@@ -420,20 +418,26 @@ describe( 'Wikibase GraphQL', () => {
 		);
 	} );
 
-	it( 'retains boolean fields (T419560)', async () => {
-		const response = await queryGraphQL( { query: `
-		{
-			__type(name: "Item") {
-				fields { isDeprecated }
-			}
-		}` } );
+	it( 'can look up items by externalId', async () => {
 
-		expect( response.body.data.__type.fields )
-			.to.deep.include( { isDeprecated: false } );
+		const response = await queryGraphQL( { query: `
+			{
+				itemByExternalId(property: "${ property4.id }", externalId: "${ item1ExternalId }") {
+					... on Item { id }
+				}
+			}` } );
+
+		assert.deepEqual(
+			response.body,
+			{
+				data: {
+					itemByExternalId: { id: item3.id }
+				}
+			}
+		);
 	} );
 
-	it( 'supports operationName parameter, required only if multiple operations are present in the query', async function () {
-		skipIfNoOpenSearch.call( this );
+	it( 'supports operationName parameter, required only if multiple operations are present in the query', async () => {
 
 		const response = await queryGraphQL( {
 			query: `query item1 { item(id: "${ item1.id }") { id } }
@@ -452,23 +456,17 @@ describe( 'Wikibase GraphQL', () => {
 			} );
 	} );
 
-	it( 'supports variables parameter', async function () {
-		skipIfNoOpenSearch.call( this );
 
-		const response = await queryGraphQL( {
-			query: 'query item($id: ItemId!) { item(id : $id) { id } }',
-			variables: { id: item1.id }
-		} );
+	it( 'retains boolean fields (T419560)', async () => {
+		const response = await queryGraphQL( { query: `
+		{
+			__type(name: "Item") {
+				fields { isDeprecated }
+			}
+		}` } );
 
-		assert.deepEqual(
-			response.body,
-			{
-				data: {
-					item: {
-						id: item1.id
-					}
-				}
-			} );
+		expect( response.body.data.__type.fields )
+			.to.deep.include( { isDeprecated: false } );
 	} );
 
 	it( 'throws an error when query is missing', async () => {
