@@ -44,6 +44,9 @@ jobs:
       - name: Apply WB settings
         run: bash ./build/ci-scripts/mw-apply-wb-settings.sh
 
+      - name: Apply e2e WB settings
+        run: bash ./build/ci-scripts/mw-apply-e2e.sh
+
       - name: Update DB
         run: bash ./build/ci-scripts/update-db.sh
 
@@ -73,7 +76,8 @@ jobs:
       - name: Wait for MediaWiki
         run: |
           for i in $(seq 1 30); do
-            curl -fsS http://127.0.0.1:8080/api.php >/dev/null && exit 0
+            curl -fsS http://127.0.0.1:8080/api.php >/dev/null && \
+            curl -fsS http://127.0.0.1:8080/rest.php >/dev/null && exit 0
             sleep 1
           done
           cat /tmp/php-server.log
@@ -87,6 +91,11 @@ jobs:
 
       - name: Run REST search schema tests
         run: npm --prefix repo/rest-api run api-testing:spec-search
+
+      - name: Dump MediaWiki server log
+        if: ${{ always() }}
+        run: |
+          test -f /tmp/php-server.log && cat /tmp/php-server.log || true
 
       - name: Send mail
         if: ${{ failure() }}
