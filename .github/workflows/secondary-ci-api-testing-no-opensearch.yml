@@ -58,7 +58,7 @@ jobs:
 
       - name: Create api-testing config
         run: |
-            SECRET_KEY=$(grep "\$wgSecretKey" ../mediawiki/LocalSettings.php | sed -E "s/.*'([^']+)'.*/\1/")
+            SECRET_KEY=$(sed -nE 's/^\$wgSecretKey *= *["'"'"']([^"'"'"']+)["'"'"'];/\1/p' ../mediawiki/LocalSettings.php)
             cat > .api-testing.config.json <<EOF
             {
             "base_uri": "http://127.0.0.1:8080/",
