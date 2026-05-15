@@ -30,11 +30,11 @@ use Wikibase\Search\Elastic\InLabelSearch;
  */
 class InLabelSearchEngineTest extends TestCase {
 
-	public static function setUpBeforeClass(): void {
-		if ( !ExtensionRegistry::getInstance()->isLoaded( 'WikibaseCirrusSearch' ) ) {
-			self::markTestSkipped( 'CirrusSearch needs to be enabled to run this test' );
-		}
-	}
+	// public static function setUpBeforeClass(): void {
+	// 	if ( !ExtensionRegistry::getInstance()->isLoaded( 'WikibaseCirrusSearch' ) ) {
+	// 		self::markTestSkipped( 'CirrusSearch needs to be enabled to run this test' );
+	// 	}
+	// }
 
 	/**
 	 * @dataProvider itemSearchResultsProvider
