@@ -221,9 +221,9 @@ describe( 'Wikibase GraphQL', () => {
 	} );
 
 	describe( 'searchItems', () => {
-		// before( function () {
-		// 	skipIfNoOpenSearch.call( this );
-		// } );
+		before( function () {
+			skipIfNoOpenSearch.call( this );
+		} );
 
 		it( 'property value pair match with "and"', async function () {
 			const response = await queryGraphQL( { query: `
@@ -351,10 +351,10 @@ describe( 'Wikibase GraphQL', () => {
 
 	it( 'can look up items by sitelink', async () => {
 
-		const sitelinkTitle = item1.sitelinks[ siteId ].title;
+		// const sitelinkTitle = item1.sitelinks[ siteId ].title;
 		const response = await queryGraphQL( { query: `
 			{
-				itemBySitelink(title: "${ sitelinkTitle }", siteId: "${ siteId }") { id }
+				itemBySitelink(title: "${ linkedArticle }", siteId: "${ siteId }") { id }
 			}` } );
 
 		assert.deepEqual(
@@ -385,10 +385,8 @@ describe( 'Wikibase GraphQL', () => {
 			} );
 	} );
 
-	it( 'can look up items by externalId', async () => {
-		// before( function () {
-		// 	skipIfNoOpenSearch.call( this );
-		// } );
+	it( 'can look up items by externalId', async function () {
+		skipIfNoOpenSearch.call( this );
 
 		const response = await queryGraphQL( { query: `
 			{
@@ -424,7 +422,6 @@ describe( 'Wikibase GraphQL', () => {
 					}
 				}
 			} );
-	} );
 	} );
 
 	it( 'supports introspection', async () => {
@@ -488,4 +485,6 @@ describe( 'Wikibase GraphQL', () => {
 			response.body,
 			{ errors: [ { message: "Requests must be sent as 'application/json'" } ] }
 		);
+	} );
+
 	} );
