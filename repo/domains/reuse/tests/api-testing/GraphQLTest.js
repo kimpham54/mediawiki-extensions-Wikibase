@@ -386,37 +386,6 @@ describe( 'Wikibase GraphQL', () => {
 				}
 			} );
 	} );
-	} );
-
-	it( 'supports introspection', async () => {
-		const response = await queryGraphQL( { query: `
-			{
-				__schema {
-					queryType {
-						fields { name }
-					}
-				}
-			}` } );
-
-		assert.deepEqual(
-			response.body,
-			{
-				data: {
-					__schema: {
-						queryType: {
-							fields: [
-								{ name: 'item' },
-								{ name: 'itemsById' },
-								{ name: 'itemByExternalId' },
-								{ name: 'searchItems' },
-								{ name: 'itemBySitelink' }
-							]
-						}
-					}
-				}
-			}
-		);
-	} );
 
 	it( 'can look up items by externalId', async () => {
 
@@ -455,7 +424,37 @@ describe( 'Wikibase GraphQL', () => {
 				}
 			} );
 	} );
+	} );
 
+	it( 'supports introspection', async () => {
+		const response = await queryGraphQL( { query: `
+			{
+				__schema {
+					queryType {
+						fields { name }
+					}
+				}
+			}` } );
+
+		assert.deepEqual(
+			response.body,
+			{
+				data: {
+					__schema: {
+						queryType: {
+							fields: [
+								{ name: 'item' },
+								{ name: 'itemsById' },
+								{ name: 'itemByExternalId' },
+								{ name: 'searchItems' },
+								{ name: 'itemBySitelink' }
+							]
+						}
+					}
+				}
+			}
+		);
+	} );
 
 	it( 'retains boolean fields (T419560)', async () => {
 		const response = await queryGraphQL( { query: `
