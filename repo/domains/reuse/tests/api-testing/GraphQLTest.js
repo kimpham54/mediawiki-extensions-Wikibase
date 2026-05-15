@@ -37,7 +37,6 @@ function skipIfNoOpenSearch() {
 }
 
 describe( 'Wikibase GraphQL', () => {
-	describe( 'queries requiring OpenSearch-backed setup', () => {
 	let item1;
 	let item2;
 	let item3;
@@ -53,10 +52,6 @@ describe( 'Wikibase GraphQL', () => {
 	const property2label = `hasRelationship ${ utils.uniq() }`;
 	const item2Property3StatementValue = 'sweet potato';
 	const item1ExternalId = 'external-id';
-
-	before( function () {
-		skipIfNoOpenSearch.call( this );
-	} );
 
 	before( async () => {
 		await action.getAnon().edit( linkedArticle, { text: 'sitelink test page' } );
@@ -226,6 +221,9 @@ describe( 'Wikibase GraphQL', () => {
 	} );
 
 	describe( 'searchItems', () => {
+		before( function () {
+			skipIfNoOpenSearch.call( this );
+		} );
 
 		it( 'property value pair match with "and"', async function () {
 			const response = await queryGraphQL( { query: `
@@ -388,6 +386,9 @@ describe( 'Wikibase GraphQL', () => {
 	} );
 
 	it( 'can look up items by externalId', async () => {
+		before( function () {
+			skipIfNoOpenSearch.call( this );
+		} );
 
 		const response = await queryGraphQL( { query: `
 			{
@@ -488,4 +489,3 @@ describe( 'Wikibase GraphQL', () => {
 			{ errors: [ { message: "Requests must be sent as 'application/json'" } ] }
 		);
 	} );
-} );
