@@ -95,6 +95,10 @@ describe( 'Wikibase GraphQL', () => {
 
 
 // to remove later kim
+// to remove later kim
+// to remove later kim
+// to remove later kim
+// to remove later kim
 console.log( 'GraphQLTest siteId:', siteId );
 console.log( 'GraphQLTest linkedArticle:', linkedArticle );
 console.log( 'GraphQLTest sitelinks payload:', JSON.stringify( {
@@ -150,6 +154,13 @@ assert.include(
     sitelinkResponse.status,
     `setSitelink failed: ${JSON.stringify( sitelinkResponse.body )}`
 );
+// to remove later kim
+// to remove later kim
+// to remove later kim
+// to remove later kim
+// to remove later kim
+console.log( 'setSitelink status:', sitelinkResponse.status );
+console.log( 'setSitelink body:', JSON.stringify( sitelinkResponse.body ) );
 
 		// Create item with two statements, potato: isType -> vegetable, hasRelationship->vegetable
 		item2 = await createItem( {
