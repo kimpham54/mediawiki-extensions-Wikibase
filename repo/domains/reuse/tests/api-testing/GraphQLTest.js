@@ -5,18 +5,49 @@ const { expect } = require( 'chai' );
 const config = require( 'api-testing/lib/config' );
 const { RequestBuilder } = require( '../../../../rest-api/tests/mocha/helpers/RequestBuilder.js' );
 
-async function createItem( item ) {
-	return ( await new RequestBuilder()
-		.withRoute( 'POST', '/v1/entities/items' )
-		.withJsonBodyParam( 'item', item )
-		.makeRequest() ).body;
+// async function createItem( item ) {
+// 	return ( await new RequestBuilder()
+// 		.withRoute( 'POST', '/v1/entities/items' )
+// 		.withJsonBodyParam( 'item', item )
+// 		.makeRequest() ).body;
+// }
+
+// async function createProperty( property ) {
+// 	return ( await new RequestBuilder()
+// 		.withRoute( 'POST', '/v1/entities/properties' )
+// 		.withJsonBodyParam( 'property', property )
+// 		.makeRequest() ).body;
+// }
+async function createItem( item, user ) {
+    const response = await new RequestBuilder()
+        .withRoute( 'POST', '/v1/entities/items' )
+        .withJsonBodyParam( 'item', item )
+        .withUser( user )
+        .makeRequest();
+
+    assert.strictEqual(
+        response.status,
+        201,
+        `createItem failed: ${JSON.stringify( response.body )}`
+    );
+
+    return response.body;
 }
 
-async function createProperty( property ) {
-	return ( await new RequestBuilder()
-		.withRoute( 'POST', '/v1/entities/properties' )
-		.withJsonBodyParam( 'property', property )
-		.makeRequest() ).body;
+async function createProperty( property, user ) {
+    const response = await new RequestBuilder()
+        .withRoute( 'POST', '/v1/entities/properties' )
+        .withJsonBodyParam( 'property', property )
+        .withUser( user )
+        .makeRequest();
+
+    assert.strictEqual(
+        response.status,
+        201,
+        `createProperty failed: ${JSON.stringify( response.body )}`
+    );
+
+    return response.body;
 }
 
 function queryGraphQL( requestBody ) {
@@ -351,10 +382,10 @@ describe( 'Wikibase GraphQL', () => {
 
 	it( 'can look up items by sitelink', async () => {
 
-		// const sitelinkTitle = item1.sitelinks[ siteId ].title;
+		const sitelinkTitle = item1.sitelinks[ siteId ].title;
 		const response = await queryGraphQL( { query: `
 			{
-				itemBySitelink(title: "${ linkedArticle }", siteId: "${ siteId }") { id }
+				itemBySitelink(title: "${ sitelinkTitle }", siteId: "${ siteId }") { id }
 			}` } );
 
 		assert.deepEqual(
