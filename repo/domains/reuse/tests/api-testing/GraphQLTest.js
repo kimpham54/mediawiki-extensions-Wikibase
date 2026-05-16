@@ -91,6 +91,19 @@ describe( 'Wikibase GraphQL', () => {
 			{ wbprop: 'siteid' }
 		) ).siteid;
 
+
+
+
+// to remove later kim
+console.log( 'GraphQLTest siteId:', siteId );
+console.log( 'GraphQLTest linkedArticle:', linkedArticle );
+console.log( 'GraphQLTest sitelinks payload:', JSON.stringify( {
+    [ siteId ]: { title: linkedArticle }
+} ) );
+
+
+
+
 		property1 = await createProperty( {
 			data_type: 'wikibase-item',
 			labels: { en: property1label }
@@ -122,7 +135,7 @@ describe( 'Wikibase GraphQL', () => {
 					}
 				]
 			},
-			sitelinks: { [ siteId ]: { title: linkedArticle } }
+			// sitelinks: { [ siteId ]: { title: linkedArticle } }
 		} );
 
 		// Create item with two statements, potato: isType -> vegetable, hasRelationship->vegetable
