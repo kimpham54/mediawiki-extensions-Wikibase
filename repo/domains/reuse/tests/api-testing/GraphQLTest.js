@@ -135,8 +135,21 @@ console.log( 'GraphQLTest sitelinks payload:', JSON.stringify( {
 					}
 				]
 			},
-			// sitelinks: { [ siteId ]: { title: linkedArticle } }
 		} );
+
+		// add sitelink after item creation
+const sitelinkResponse = await new RequestBuilder()
+    .withRoute( 'PUT', '/v1/entities/items/{item_id}/sitelinks/{site_id}' )
+    .withPathParam( 'item_id', item1.id )
+    .withPathParam( 'site_id', siteId )
+    .withJsonBodyParam( 'sitelink', { title: linkedArticle } )
+    .makeRequest();
+
+assert.include(
+    [ 200, 201 ],
+    sitelinkResponse.status,
+    `setSitelink failed: ${JSON.stringify( sitelinkResponse.body )}`
+);
 
 		// Create item with two statements, potato: isType -> vegetable, hasRelationship->vegetable
 		item2 = await createItem( {
@@ -395,11 +408,10 @@ console.log( 'GraphQLTest sitelinks payload:', JSON.stringify( {
 
 	it( 'can look up items by sitelink', async () => {
 
-		const sitelinkTitle = item1.sitelinks[ siteId ].title;
-		const response = await queryGraphQL( { query: `
-			{
-				itemBySitelink(title: "${ sitelinkTitle }", siteId: "${ siteId }") { id }
-			}` } );
+const response = await queryGraphQL( { query: `
+    {
+        itemBySitelink(title: "${ linkedArticle }", siteId: "${ siteId }") { id }
+    }` } );
 
 		assert.deepEqual(
 			response.body,
